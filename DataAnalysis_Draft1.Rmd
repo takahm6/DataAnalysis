@@ -2,7 +2,7 @@
 <!-- For more info on the package options see http://yihui.name/knitr/options -->
 
 <!-- Replace below with the title of your project -->
-### Does Educational Attainment really pay off?
+# Does Educational Attainment really pay off?
 
 <!-- Enter the code required to load your data in the space below. The data will be loaded but the line of code won't show up in your write up (echo=FALSE) in order to save space-->
 ```{r echo=FALSE}
@@ -11,11 +11,11 @@ load(url("http://bit.ly/dasi_gss_data"))
 
 <!-- In the remainder of the document, add R code chunks as needed -->
 
-### Introduction:
+## Introduction:
 
 The analysis investigates the relationship between the educational attainment and the one's perception on his/her financial status during last few years.  Most people grew up hearing the lectures from their parents and teachers how important to go to school.  The prospect of the US economy continues to look grim while the price tag on the higher education is on the rise.  It is a high time to ask the questions: Is there a return on investment in monetary sense?  How much is enough to get one equipped for what is called knowledge economy?  Is more the better?
 
-### Data:
+## Data:
 
 ### Overview
   The General Social Survey (GSS) data used in this analysis was obtained from the web site of the National Opinion Research Center. [1]  The original dataset had been modified by facilitators of Statistical Analysis and Inference class on Coursera. [2]
@@ -23,7 +23,7 @@ The analysis investigates the relationship between the educational attainment an
 The General Social Survey (GSS) was conducted by the National Opinion Research Center.  The survey collects demographic data such as the respondent's age, gender, and ethnicity as well as religious affiliations along with his/her opinion on social and political issues in the contemporary America.     
 The data set that will be used in the analysis is a cumulative data from 1972 to 2012.  The total number of the observation is 57061 with 144 variables.  The interviews were conducted by one of these methods: in-person, telephone, computer-aided.  
 
-## Cases
+### Cases
   In this analysis, a case is defined as an observed response on one's highest degree completed and his/her perception about change in his/her financial situation in the last few years.  1010 observations were removed from the analysis since their degree information were not provided (NA).  Therefore, the analysis was conducted based on 56051 observations.   
   
 ### Variables of Interest
@@ -39,7 +39,7 @@ The variables of the interest are only two out of 144 collected by the GSS, name
   
 Since this is an observational study, this data cannot be used to establish causality between the educational attainment and the financial situation.  Instead, the analysis seeks correlations between two variables.
 
-### Exploratory data analysis:
+## Exploratory data analysis:
 
 Insert exploratory data analysis here...
 ```{r}
@@ -49,6 +49,15 @@ table(gss$degree, useNA='ifany')
 
 ```{r}
 table(gss$finalter, useNA='ifany')
+```
+
+```{r echo=FALSE}
+gss.LtHigh <- subset(gss, gss$degree=="Lt High School")
+gss.LtHigh <- subset(gss, gss$degree=="Lt High School")
+gss.High <- subset(gss, gss$degree=="High School")
+gss.JuniorCol <- subset(gss, gss$degree=="Junior College")
+gss.Bachelor <- subset(gss, gss$degree=="Bachelor")
+gss.Grad <- subset(gss, gss$degree=="Graduate")
 ```
 
 ```{r}
@@ -70,10 +79,40 @@ prop.table(table(as.character(gss.Bachelor$degree), gss.Bachelor$finalter, useNA
 ```{r}
 prop.table(table(as.character(gss.Grad$degree), gss.Grad$finalter, useNA='ifany'))
 ```
+```{r echo=FALSE}
+par(mfrow =c(2,3))
+LtHigh.prop <- prop.table(table(as.character(gss.LtHigh$degree), gss.LtHigh$finalter, useNA='ifany'))
 
-### Inference:
+High.prop <- prop.table(table(as.character(gss.High$degree), gss.High$finalter, useNA='ifany'))
 
-Insert inference section here...
+JuniorCol.prop <- prop.table(table(as.character(gss.JuniorCol$degree), gss.JuniorCol$finalter, useNA='ifany'))
+```
+```{r}
+barplot(LtHigh.prop, main="Less Than High School", ylab="Proportion")
+barplot(High.prop, main="High School", ylab="Proportion")
+barplot(JuniorCol.prop, main="Junior College", ylab="Proportion")
+```
+
+## Inference:
+
+### Hypotheses
+
+#### The null hypotheses: 
+One's perception on his/her financial situaton during the past few years and his/her educational attainment are independent.   
+
+#### The alternate hypotheses:
+One's perception on his/her financial situaton during the past few years and his/her educational attainment are dependent. 
+
+  Since this is an analysis of the relationship between two categorical variables with multiple levels, chi-square of independence test is the method of inference.
+  
+### Conditions
+  Conditions for the chi-square test of indepndence were met as explained below.
+  
+  1. Sampled observations are random that are representative of the previously described population. 
+  2. Observations are also independent since the respondents are reporting their highest degree attained.
+  3. The number of the observations (56051) is less than 10% of the population (US population:313.9 million (2012)).
+  4. Each case only contributes to one cell in the table since each respondent corresponds to one case.
+  5. Each cell has at least five expected cases.
 
 ### Conclusion:
 
