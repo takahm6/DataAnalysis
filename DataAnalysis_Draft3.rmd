@@ -1,0 +1,165 @@
+<!-- Make sure that the knitr package is installed and loaded. -->
+<!-- For more info on the package options see http://yihui.name/knitr/options -->
+
+<!-- Replace below with the title of your project -->
+# Does Educational Attainment really pay off?
+
+<!-- Enter the code required to load your data in the space below. The data will be loaded but the line of code won't show up in your write up (echo=FALSE) in order to save space-->
+```{r echo=FALSE}
+# set the working directory 
+setwd("/Users/makikotakahashi/DataAnalysis")
+# load the data
+load(url("http://bit.ly/dasi_gss_data"))
+```
+
+<!-- In the remainder of the document, add R code chunks as needed -->
+
+## Introduction:
+
+The analysis investigated the relationship between the educational attainment and the one's perception on his/her financial status during last few years.  Most people grew up hearing the lectures from their parents and teachers how important to go to school.  The prospect of the US economy continues to look grim while the price tag on the higher education is on the rise.  It is a high time to ask the questions: Does one's educational attainment have influence in the opinion on how his/her financial situation improved or disproved in the past few years?
+
+## Data:
+
+### Overview
+  The General Social Survey (GSS) data used in this analysis was obtained from the web site of the National Opinion Research Center. [1]  The original dataset had been modified by facilitators of Statistical Analysis and Inference class on Coursera. [2]
+
+The General Social Survey (GSS) was conducted by the National Opinion Research Center.  The survey collects demographic data such as the respondent's age, gender, and ethnicity as well as religious affiliations along with his/her opinion on social and political issues in the contemporary America.     
+The data set that will be used in the analysis is a cumulative data from 1972 to 2012.  The total number of the observation is 57061 with 144 variables.  The interviews were conducted by one of these methods: in-person, telephone, computer-aided.  
+
+### Cases
+  In this analysis, a case is defined as an observed response on one's highest degree completed and his/her perception about change in his/her financial situation in the last few years.  This dataset is a compiled dataset from surveys conducted in different years. Since the element of time introduces another dimention to the question, this analysis focuses on the survey result from 2012 only.  The number of observations from 2012 was 1974.  Also, observations with NAs in degree field and finalter (financial situation during last few years) field were excluded from the analysis.  There were 8 NAs for degree and 7 NAs for financial situation.  This left 1959 observations for this analysis.     
+  
+### Variables of Interest
+The variables of the interest are only two out of 144 collected by the GSS, namely degree and finalter.  The independent variable is degree.  This indicates the highest degree completed by the respondent.  This is an ordinal categorical variable with five levels: Less than High School (coded as Lt High School), High School, Junior College, Bachelor, and Graduate.  The dependent variable is finalter.  This is the respondent's opinion on of whether his/her financial situation has gotten better, stayed the same, or worth in the last few years.  This is an ordinal categorical variable with three levels: Worse, Stayed Same, and Better.
+  
+### Type of Study
+  This is an observational study.  The data was collected by conducting a survey and was not  result from a designed experiment where subjects are randomly assigned to a control group and a treatment group.  
+
+### Scope of Inferences
+  The population of the concern is males and females whose age ranging from 18 and 89 who are living in the United States. The data was collected from the people with various educational levels, financial status, ethnic backgrounds, marital status, and regions of the United States.  The intention is to be representative of the current US population.  Therefore the analysis can be generalized to adults who are living in the United States. 
+  
+  The survey data was collected from the people who agreed to participate in the survey and were reachable by the means of a telephone line, a computer network, or in-person.  This could be a source of a bias.  
+  
+Since this is an observational study, this data cannot be used to establish causality between the educational attainment and the financial situation.  Instead, the analysis seeks correlations between two variables.
+
+## Exploratory data analysis:
+
+The below shows the contingency table of degree and financial situation by count, based on the subset data withough NAs.
+
+```{r}
+## Excluding observations with NAs
+gss.analysis <- subset(gss, !is.na(gss$degree) & gss$year == 2012 & !is.na(gss$finalter), select = c(degree, finalter, year))
+table(gss.analysis$degree, gss.analysis$finalter)
+```
+
+The below is the same data expressed in proportions and the barplot representation of it.
+```{r}
+## Proportion
+prop.all <- prop.table(table(gss.analysis$finalter))
+prop.all
+barplot(prop.all, ylim=c(0, 0.45), main='Opinion on Financial Situations (All observations)')
+```
+
+Next, the observations were devided into sub-groups by educational attainment. 
+```{r echo=FALSE}
+gss.LtHigh <- subset(gss.analysis, gss.analysis$degree=="Lt High School")
+gss.High <- subset(gss.analysis, gss.analysis$degree=="High School")
+gss.JuniorCol <- subset(gss.analysis, gss.analysis$degree=="Junior College")
+gss.Bachelor <- subset(gss.analysis, gss.analysis$degree=="Bachelor")
+gss.Grad <- subset(gss.analysis, gss.analysis$degree=="Graduate")
+```
+
+Crosstab and barplot of proportions from each group exhibit noticable variabilities.  This suggests that one's educational attainment may contribute to the perception on his/he financial situation.
+
+```{r}
+## Less Than High School
+LtHigh.prop <- prop.table(table(gss.LtHigh$finalter))
+LtHigh.prop
+barplot(LtHigh.prop, main="Less Than High School", ylim =c(0, 0.45), ylab="Proportion")
+
+## High School
+High.prop <- prop.table(table(gss.High$finalter))
+High.prop
+barplot(High.prop, main="High School", ylim =c(0, 0.45), ylab="Proportion")
+
+## Junior College
+JuniorCol.prop <- prop.table(table(gss.JuniorCol$finalter))
+JuniorCol.prop
+barplot(JuniorCol.prop, main="Junior College", ylim =c(0, 0.45), ylab="Proportion")
+
+## Bachelor
+Bachelor.prop <- prop.table(table(gss.Bachelor$finalter))
+Bachelor.prop
+barplot(Bachelor.prop, main="Bachelor", ylim =c(0, 0.45), ylab="Proportion")
+
+## Graduate
+Grad.prop <- prop.table(table(gss.Grad$finalter))
+Grad.prop
+barplot(Grad.prop, main="Graduate", ylim =c(0, 0.45), ylab="Proportion")
+```
+
+## Inference:
+
+### Statements of Hypotheses
+
+The null hypotheses: 
+One's perception on his/her financial situaton during the past few years and his/her educational attainment are independent at significance level of 0.05.   
+
+The alternate hypotheses:
+One's perception on his/her financial situaton during the past few years and his/her educational attainment are dependent. 
+
+### The method
+  Since this is an analysis of the relationship between two categorical variables with multiple levels, chi-square of independence test is the method of inference.
+  
+### Conditions
+  Conditions for the chi-square test of indepndence were met as explained below.
+  
+  1. Sampled observations are random that are representative of the previously described population. 
+  2. Observations are also independent since the respondents are reporting their highest degree attained.
+  3. The number of the observations (1959) is less than 10% of the population (US population:313.9 million (2012)).
+  4. Each case only contributes to one cell in the table since each respondent corresponds to one case.
+  5. Each cell has at least five expected cases.  This can be observed from the contingency table.
+  
+### Analysis
+
+  Applying chi-square independence test will yeild the result below.  The test quantitatively compares the difference between the observed counts and the expected counts.  Large deferences suggests a strong evidence for the alternative hypotheses.
+  
+```{r}
+basetbl <- table(gss.analysis$degree, gss.analysis$finalter, dnn=c("Education", "Perceptions"))
+chisq.test(basetbl)
+```
+
+The number of row comes from degree(educational attainment) variable which has five levels.  The number of column coms from finalter(financial situation during the past few years) variable which has four levels.  Hence, the degree of freedom was calculated by:
+
+df = (num of row - 1) * (num of col - 1) = 8
+The result shows a small p-value (0.001416).  This value is smaller than the significant level (alpha = 0.05) defined for this analysis.  Therefore, this is interpreted as the differences seen in the observed values and the expected values are statistically significant.  
+
+### Conclusion:
+
+  This analysis investigated the correlations between the perception on the changes of one's financial situation in a recent years and his/her educational attainment.  The publicly vailable General Social Survey data from 2012 was used.    The number of observations used was 1959.  A chi-square test of independence was performed.  The p-value(0.001416) provided a strong evidence for rejecting the null hypotheses.  Therefore, it is concluded that one's perception on his/her financial situaton during the past few years depends on his/her educational attainment.   The result is generalizable for the adult population who are US residents.
+  
+  The general trend is that more people with Bachelor and above seemed to feel that their finantial situations are improving compared to people without higer degree.  Especially, the proportion of people who feel that their financial situations are improving in the group with less than high school diploma is noticably lower than that of Bachelor and Graduate groups.  The proportions resemble one another between Bachelor group and Graduate group.  The age of the respondent was not taken into account in this analysis.  That could be an influencing factor relating to their recent employment situation as well as how established they are.    
+  
+  As a next possible research question, repeating the same analysis of educational attainment and financial situation on the dataset corrected from different year and and comparing them.  
+  
+### References:
+
+1. Smith, Tom W., Michael Hout, and Peter V. Marsden. General Social Survey, 1972-2012 [Cumulative File]. ICPSR34802-v1. Storrs, CT: Roper Center for Public Opinion Research, University of Connecticut /Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributors], 2013-09-11. doi:10.3886/ICPSR34802.v1
+
+Persistent URL: http://doi.org/10.3886/ICPSR34802.v1
+
+2. Data Analysis and Statistical Inference on Coursera.
+
+https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fgss1.html#finalter_toc
+
+3. 
+
+4. Donnelly, Jr., Robert A. The Complete Idiot's Guide to Statistics.  Second Edition.  New York, NY: Penguin Group, 2007.  282-285. Print.
+
+### Appendix:
+
+The excerpt from the dataset that was used for this analysis:
+```{r}
+head(gss.analysis, 10)
+```
+
